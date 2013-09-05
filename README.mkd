@@ -272,9 +272,10 @@ Consider this example:
     a = (x) ->
       b.push i + 1 for i in x
 
-This function returns result of the list comprehension, because that is the
+This function returns the result of the list comprehension, because that is the
 last expression in the function. It compiles to this handful:
-var a, b;
+    
+    var a, b;
 
     b = [];
 
