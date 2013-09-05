@@ -291,7 +291,7 @@ last expression in the function. It compiles to this handful:
     var a;
 
 But clearly, in this case, we aren't really interested in the return value
-which generated JavaScript frantically gathers and returns. So, in this case,
+which generated JavaScript frantically gathers and returns. In this instance,
 we should simply `return` at the end of the function and let CoffeeScript know
 that we don't expect any meaningful return value.
 
