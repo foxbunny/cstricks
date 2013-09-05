@@ -171,7 +171,7 @@ Alternatively, you can also do this:
     a =
       b: b = (i, n=0) ->
         return n if not i
-        a.b(i - 1, n + i)
+        b(i - 1, n + i)  # <-- `b` refers to `b` variable in same scope as `a`
 
 This makes `b` both `a`'s property, and a stand-alone `b` variable within the
 same scope where `a` is defined (this works in JavaScript as well).
