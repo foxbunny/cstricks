@@ -11,6 +11,7 @@ readability and/or speed things up.
  + [Return or throw](#retthrow)
  + [Deluxe list comprehensions](#deluxecomp)
  + [Recursive function as object property](#recursiveprop)
+ + [UMD wrapper](#umdwrapper)
 
 ## Immediately-invoked function expression <a name="iife"></a>
 
@@ -176,6 +177,84 @@ Alternatively, you can also do this:
 This makes `b` both `a`'s property, and a stand-alone `b` variable within the
 same scope where `a` is defined (this works in JavaScript as well).
 
+## UMD wrapper <a name="umdwrapper"></a>
+
+If you want to create an
+[UMD](https://github.com/umdjs/umd/#umd-universal-module-definition) wrapper
+for your AMD module, there are many ways to do it, including using IIFE, which
+is a [recommendation by James
+Burke](https://github.com/umdjs/umd/blob/master/commonjsAdapter.js). Here,
+we'll take a look at an alternative syntax which works well in CoffeeScript
+when using a CommonJS-style module that calls `require`.
+
+The UMD wrapper below supports browsers without AMD loaders, as well as NodeJS
+modules.
+
+    define = ((root) ->
+      if typeof root.define is 'function' and root.define.amd
+        root.define  # Return RequireJS's version of define
+      else
+        if typeof root.module is 'object' and root.module.exports
+          (factory) -> module.exports = factory(root.require)
+        else
+          require = (dep) ->
+            (() ->
+              switch dep
+                when 'underscore' then root._
+                else null
+            )() or throw new Error "Unmet dependency #{dep}"
+          (factory) -> root.myModule = factory(require)
+    ) this
+
+    define (require) ->
+      _ = require 'underscore'
+
+The above wrapper may seem huge, but it actually takes care of dependencies and
+also traps any missing dependencies when working with non-AMD browser
+situation.
+
+If the module has no dependencies, it can be simplified:
+
+    define = ((root) ->
+      if typeof root.define is 'function' and root.define.amd
+        root.define  # Return RequireJS's version of define
+      else
+        if typeof root.module is 'object' and root.module.exports
+          (factory) -> module.exports = factory()
+        else
+          (factory) -> root.myModule = factory()
+    ) this
+
+    define () ->
+
+Further, if you do not need support for NodeJS, it's even simpler:
+
+    define = ((root) ->
+      if typeof root.define is 'function' and root.define.amd
+        root.define  # Return RequireJS's version of define
+      else
+        (factory) -> root.myModule = factory()
+    ) this
+
+    define () ->
+
+Last but not least, if you do need dependencies, but don't need NodeJS:
+
+    define = ((root) ->
+      if typeof root.define is 'function' and root.define.amd
+        root.define  # Return RequireJS's version of define
+      else
+        require = (dep) ->
+          (() ->
+            switch dep
+              when 'underscore' then root._
+              else null
+          )() or throw new Error "Unmet dependency #{dep}"
+        (factory) -> root.myModule = factory(require)
+    ) this
+
+    define (require) ->
+      _ = require 'underscore'
 
 ## License
 
