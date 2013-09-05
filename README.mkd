@@ -1,0 +1,177 @@
+# CoffeeScript Tricks
+
+These are some of the tricks I use from time to time to improve the code
+readability and/or speed things up.
+
+## Contents
+
+ + [Immediately-invoked function expression](#iife)
+ + [Iterating arrays in reverse](#reverse)
+ + [Getting the last item in an array](#lastitem)
+ + [Return or throw](#retthrow)
+ + [Deluxe list comprehensions](#deluxecomp)
+ + [Recursive function as object property](#recursiveprop)
+
+## Immediately-invoked function expression <a name="iife"></a>
+
+This might not be such a 'big' trick, but here's the syntax:
+
+    ((args...) ->
+
+    ) args...
+
+Yeah, nothing too spectacular here. Moving on.
+
+## Iterating arrays in reverse <a name="reverse"></a>
+
+This one might also be obvious to most, but here it is anyway:
+
+    a = [1, 2, 3, 4]
+
+    for i in a by -1
+      console.log i
+
+## Getting the last item in an array <a name="lastitem"></a>
+
+Most people would think:
+
+    a[a.length - 1]
+
+But there's a slightly better way:
+
+    a[-1..][0]
+
+And, no, `a[-1]` doesn't work. And, yes, you can still use `a.pop()` if you
+don't care about what happens to `a`.
+
+## Return or throw <a name="retthrow"></a>
+
+This is one of those patterns that look so obvious when written in
+CoffeeScript, and yet it compiles into something quite delicious and hackish.
+
+    a = () ->
+      # calculate x
+      x or throw new Error 'OMFG!'
+
+You just have to see what it looks like when compiled:
+
+    var a;
+
+    a = function() {
+      return x || (function() {
+        throw new Error('OMFG!');
+      })();
+    };
+
+## Deluxe list comprehensions <a name="deluxecomp"></a>
+
+Let's say we have an array of objects, and we want to transform that object in
+some way and create a new array or simply overwrite the old one.
+
+Let's say the array looks like this:
+
+    a = [
+      {a: 2, b: 4}
+      {a: 3, b: 5}
+      {a: 12, b: 0}
+    ]
+
+Now let's add a `c` key that will be sum of keys `a` and `b`:
+
+    a = (
+      ((o) -> 
+        a: o.a
+        b: o.b
+        c: o.a + o.b
+      ) o for o in a
+    )
+
+The `a = (expression for o in a)` is a classic list comprehension. For the
+`expression` we use an IIFE (immediately-invoking function expression) which,
+extracted, looks like this:
+
+    (o) -> 
+      a: o.a
+      b: o.b
+      c: o.a + o.b
+    ) o
+
+You can exclude the outer brackets of the list comprehensions provided that you
+do not change the relative position in code of the actual comprehension. The
+code below compiles to identical JavaScript as the code above:
+
+    a =  # <-- look, mommy, no bracket!
+      ((o) -> 
+        a: o.a
+        b: o.b
+        c: o.a + o.b
+      ) o for o in a
+
+The reason CoffeeScript compiler works like this is beyond me, so don't ask.
+The above form is a bit confusing, though, so let's just use brackets when
+assigning to variables.
+
+You're also guessing correctly that we can also use the deluxe version of
+`when` in the comprehensions:
+
+    a =  # <-- look, mommy, no bracket!
+      ((o) -> 
+        a: o.a
+        b: o.b
+        c: o.a + o.b
+      ) o for o in a when ((o) ->
+        o.a > o.b
+      ) o
+
+When using the deluxe list comprehensions as a return value, you don't need to
+include the outer brackets.
+
+    c = () ->
+      ((o) -> 
+        a: o.a
+        b: o.b
+        c: o.a + o.b
+      ) o for o in a  # <-- look, mommy, no brackets!
+
+When using as return value, I think it's ok to just omit the brackets. It
+doesn't make any difference at all.
+
+## Recursive function as object property <a name="recursiveprop"></a>
+
+You can use a recursive function as an object property. The problem is usually
+how to call this function from within itself when it's being assigned as a
+property. Take a look at this:
+
+    a =
+      b: () ->
+
+How do you call `a.b` from within itself? Well, you can simply call it as
+`@b()`
+
+    a =
+      b: (i, n=0) ->
+        return n if not i
+        @b(i - 1, n + i)
+
+What if we want to use b stand-alone? For example, we want to do something
+like:
+
+    b = a.b
+    b 12
+
+In this case, we need `b` to refer to itsef using the reference to `a`:
+
+    a =
+      b: (i, n=0) ->
+        return n if not i
+        a.b(i - 1, n + i)
+
+Alternatively, you can also do this:
+
+    a =
+      b: b = (i, n=0) ->
+        return n if not i
+        a.b(i - 1, n + i)
+
+This makes `b` both `a`'s property, and a stand-alone `b` variable within the
+same scope where `a` is defined (this works in JavaScript as well).
