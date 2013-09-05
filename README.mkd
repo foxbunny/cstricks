@@ -13,7 +13,7 @@ readability and/or speed things up.
  + [Recursive function as object property](#recursiveprop)
  + [UMD wrapper](#umdwrapper)
 
-## Immediately-invoked function expression <a name="iife"></a>
+## Immediately-invoked function expression (IIFE) <a name="iife"></a>
 
 This might not be such a 'big' trick, but here's the syntax:
 
@@ -88,8 +88,7 @@ Now let's add a `c` key that will be sum of keys `a` and `b`:
     )
 
 The `a = (expression for o in a)` is a classic list comprehension. For the
-`expression` we use an IIFE (immediately-invoking function expression) which,
-extracted, looks like this:
+`expression` we use an IIFE which, extracted, looks like this:
 
     (o) -> 
       a: o.a
