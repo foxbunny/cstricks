@@ -12,6 +12,7 @@ readability and/or speed things up.
  + [Deluxe list comprehensions](#deluxecomp)
  + [Recursive function as object property](#recursiveprop)
  + [UMD wrapper](#umdwrapper)
+ + [Clean up JavaScript by returning](#cleanreturn)
 
 ## Immediately-invoked function expression (IIFE) <a name="iife"></a>
 
@@ -255,6 +256,59 @@ Last but not least, if you do need dependencies, but don't need NodeJS:
     define (require) ->
       _ = require 'underscore'
 
+## Cleaning up JavaScript by returning <a name="cleanreturn"></a>
+
+If you are like me, you are probably used to coding CoffeeScript blind-folded
+and you rarely look at the output code (unless something breaks, that is, and
+maybe not even then). Sometimes, though, code that _works_ might not be as nice
+in JavaScript as it seems in CoffeeScript. In some cases this is because in
+CoffeeScript, everything is an expression, and the last expression evaluated
+will be returned from a function.
+
+Consider this example:
+
+    b = []
+
+    a = (x) ->
+      b.push i + 1 for i in x
+
+This function returns result of the list comprehension, because that is the
+last expression in the function. It compiles to this handful:
+var a, b;
+
+    b = [];
+
+    a = function(x) {
+      var i, _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = x.length; _i < _len; _i++) {
+        i = x[_i];
+        _results.push(b.push(i + 1));
+      }
+      return _results;
+    };
+    var a;
+
+But clearly, in this case, we aren't really interested in the return value
+which generated JavaScript frantically gathers and returns. So, in this case,
+we should simply `return` at the end of the function and let CoffeeScript know
+that we don't expect any meaningful return value.
+
+    a = (x) ->
+      b.push i + 1 for i in x
+      return
+
+This makes the JavaScript a lot slimmer, and depending on what you are doing,
+much faster, too.
+
+    a = function(x) {
+      var i, _i, _len;
+      for (_i = 0, _len = x.length; _i < _len; _i++) {
+        i = x[_i];
+        b.push(i + 1);
+      }
+    };
+
 ## License
 
 <a rel="license"
@@ -266,7 +320,7 @@ src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a>
 xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
 property="dct:title" rel="dct:type">CoffeeScript Tricks</span> by <a
 xmlns:cc="http://creativecommons.org/ns#"
-href="https://github.com/foxbunny/cstricks" property="cc:attributionName"
+href="https://github.com/foxbunny" property="cc:attributionName"
 rel="cc:attributionURL">Branko Vukelic</a> is licensed under a <a rel="license"
 href="http://creativecommons.org/licenses/by/3.0/deed.en_US">Creative Commons
 Attribution 3.0 Unported License</a>.<br />Based on a work at <a
