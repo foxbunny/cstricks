@@ -1,0 +1,1032 @@
+# Foxbunny's new CoffeeScript style guide
+
+People who know my CoffeeScript know that this guide has nothing to do with
+code I have written before I wrote this guide. This guide is a result of many
+gotchas and pitfalls I have encountered while writing CoffeeScript, and my
+resolution to introduce some discipline into my code.
+
+JavaScript has bad parts that CoffeeScript aimed to fix. However, in doing so,
+CoffeeScript itself introduced its own hideous parts that also present some of
+the most attractive parts of the syntax. While it may be tempting to use all
+the seemingly nice features of the language (such as not using braces for
+object literals), it introduces a level of ambiguity that no developer should
+feel comfortable with. This guide aims to present a set of rules that removes
+such ambiguity and allow developers to write consistent and readable code.
+
+As with all style guides, this style guide seeks to address issues of
+readability, clarity of intent, and similar characteristics that makes our
+relationship with the code base more stable and enjoyable. However, as with all 
+rules, these are just recommendations that can and _should_ be broken when our
+original goals are jeopardized by the rules themselves.
+
+## When to apply the style guide
+
+Do not apply the style guide to code that has not been using it before. Only
+apply the guide to new projects. It's always better to be consistent than to
+insist on rules. If you wish to insist until the bitter end, use that time to
+convert the project to the style of your choosing.
+
+## The rule of thumb
+
+Always strive of clarity. If something isn't very obvious at the first glance
+or you suspect someone else might be confused by it, simply avoid it.
+
+There should be one way to do it. Don't use rules that have an `if` clause in
+them. For example:
+
+> You don't have to use brackets around function arguments. You should use them
+> _if_ there is a nested function call, and so on and so forth.
+
+The right way is to always use the brackets if there is so much as a single
+case where they are absolutely unavoidable.
+
+Some of the rules outlined blow are not _that_ clear-cut. Some might actually
+have an if clause or two. However, you should always choose one way or the
+other and be consistent within the same project, if not generally.
+
+## Indentation
+
+We will adopt the standard of indenting with 2 spaces.
+    ## Good
+
+    if foo
+      bar
+
+    ## Bad
+
+    if foo
+         bar
+
+    ## Bad
+    if foo
+     bar
+
+## Tabs vs spaces
+
+No tabs. End of discussion.
+
+## Trailing whitespace
+
+Trailing whitespace should genreally not exist. Set your editor to clean up 
+trailing whitespace when saving files. This avoids many issues such as the ones
+with multi-line strings.
+
+## Line length
+
+Wrap lines at 79 characters. This allows much better use of split screens and
+pasting code into plain-text emails is also much easier.
+
+## Vim users
+
+No Vim users. End of discussion. Just joking.
+
+Vim users can include the following comment in their files:
+
+    ## vim: ts=8 et sw=2 sts=2 tw=79
+
+## Commas in arrays and objects
+
+Always use commas in objects and arrays. This makes it easier to convert
+multi-line arrays and objects into single-line version, and makes copying code
+between CoffeeScript and JavaScript easier.
+
+Additionally, always include the trailing comma. It's not the end of the world
+if you forget it, but it makes diffs look better. Argument can be made that
+leaving off the trailing comma can be good for people who have to constantly
+switch between JavaScript and CoffeeScript. Use your best judgement and be
+consistent with the rest of the code base.
+
+    ## Good
+
+    foo = {
+      a: 1,
+      b: 2,
+    }
+
+    ## Good
+
+    foo = [1, 2, 3,]
+
+    ## Bad
+
+    foo = {
+      a: 1
+      b: 2
+    }
+
+    ## Bad
+
+    foo = [
+      1
+      2
+      3
+    ]
+
+    ## Also fine
+
+    foo = {
+      a: 1,
+      b: 2
+    }
+
+    ## Also fine
+
+    foo = [
+      1,
+      2,
+      3
+    ]
+
+## Quotes
+
+CoffeeScript behaves differently when using double and single quotes. Double
+quotes support variable interpolations, for example.
+
+Generally stick to using single quotes unless you want to do variable
+interpolation.
+
+    ## Good
+
+    foo = 'bar'
+
+    ## Good
+
+    foo = "#{bar} is bar"
+
+    ## Bad
+
+    foo = "bar"
+
+## Braces
+
+Opening braces and brackets should always be on the same line.
+
+    ## Good
+
+    foo = {
+      a: 1
+    }
+
+    ## Good
+
+    foo = [
+      'bar',
+      'baz',
+    ]
+
+    ## Bad
+
+    foo =
+    {
+      a: 1
+    }
+
+    ## Bad
+
+    foo =
+    [
+      'bar',
+      'baz',
+    ]
+
+## Names
+
+Use camelCase for all variable and property names. Only use initial upper-case
+for constructor functions ('classes').
+
+    ## Good
+
+    fooBar = 1
+
+    class Foo
+      constructor: () ->
+      myMethod: () ->
+
+    ## Bad
+
+    foo_bar = 1
+
+    class foo
+      constructor: () ->
+      MyMethod: () ->
+
+Use all-caps with underscores for variables that should be considered constant:
+
+    MILLISECONDS_IN_DAY = 86400000
+    Foo.FACTOR = 12
+
+## Whitespace
+
+Always leave a single blank line after each function, class, or method
+definition or function expressions. Optionally surround `if`, `switch` and
+`for` blocks with a single blank line. Do not add blank space above `else`,
+`when` and similar clauses unless it improves readability.
+
+    class MyClass
+      constructor: () ->
+
+      method: () ->
+
+      MyClass.staticMethod = () ->
+
+    func = () ->
+      'foo'
+
+    a = 1
+    b = 2
+    c = a + b
+
+    (() ->
+      root = this
+    )(window)
+
+    if typeof func is 'function'
+      console.log('yes it is')
+    else
+      console.log("no it isn't")
+
+Use a single space around assignment operators and arithmentic operators:
+
+    ## Good
+
+    a = 1 + 1
+    b = a + 2
+    foo = a + b + 4
+
+    ## Bad
+
+    a = 1+1
+    b=a+2
+    foo= a + b + 4
+
+    ## Also bad
+
+    a   = 1 + 1
+    b   = a + 2
+    foo = a + b + 4
+
+Do not use spaces around the assignment operator in arguments with default 
+values:
+
+    func = (a=1, b=2) ->
+      a + b
+
+
+Use a single space after colon in objects.
+
+    ## Good
+
+    foo = {
+      a: 1,
+      b: 2,
+      c: 4,
+    }
+
+    ## Bad
+
+    foo = {
+      abc:   1,
+      defg:  2,
+    }
+
+    foo = {
+      a:1,
+      b:2
+    }
+
+Use single space after commas in arrays and argument lists.
+
+    ## Good
+
+    arr = [1, 2, 3]
+    foo(1, 2, 3)
+
+    ## Bad
+
+    arr = [1,2,3]
+    foo(1,2,3)
+
+## Equality and boolean operators
+
+Use `is` and `isnt` instead of `==` and `!=`.
+
+    ## Good
+
+    a is b
+
+    ## Bad
+
+    a == b
+
+Use `and` and `or` instead of `&&` and `||`.
+
+    ## Good
+
+    a and b or c
+
+    ## Bad
+
+    a && b || c
+
+Use `not` instead of `!`
+
+    ## Good
+
+    not a 
+
+    ## Bad
+
+    !a
+
+For boolean coercion, you may use `!!` but still use `not` instead of single
+bang. Don't add a space after the double-bang.
+
+    ## Good
+
+    foo = not a
+    foo = !!a
+
+    ## Bad
+
+    foo = !a
+    foo = not not a
+    foo = !! a
+
+## `this` and `prototype`
+
+Always use `@` for `this` and `::` for `prototype`.
+
+    ## Good
+
+    @foo()
+    @foo + 1
+    @['foo'] = 2
+    return @
+
+    Foo:: = {}
+    Foo::bar = 2
+    Foo::['bar'] = 2
+
+    ## Bad
+
+    this.foo()
+    this.foo + 1
+    this['foo'] = 2
+
+    Foo.prototype = {}
+    Foo.prototype.bar = 2
+    Foo.prototype['bar'] = 2
+
+## Extended prototypes
+
+Do not monkey patch prototypes of native and global objects. Ever.
+
+    ## Good
+
+    empty = (a) -> !a.length
+    a = []
+    if empty(a)
+      console.log 'boink!'
+
+    ## Bad
+
+    Array::empty = () -> not @length
+    a = []
+    if a.empty()
+      console.log 'boink!'
+
+It's always a good idea to simply inherit if you have to extend something.
+
+    ## Good
+
+    class Foo
+      constructor: () ->
+
+    class MyFoo
+      constructor: () ->
+      foo: () ->
+    MyFoo:: = new Foo()
+
+    ## Bad
+
+    class Foo
+      constructor: () ->
+
+    Foo::foo = () ->
+
+## Calling constructors
+
+In both CoffeeScript and JavaScript it's possible to call a constructor
+function without the parentheses. Don't.
+
+    ## Good
+
+    new Date()
+
+    ## Bad
+
+    new Date
+
+## Return value and `return` statement
+
+Only use `return` statement if there is no other way to return from a function.
+
+    ## Good
+
+    func = (a, b) ->
+      a + b
+
+    func = (a, b) ->
+      if not a
+        undefined
+      else
+        a + b
+
+    func = (a, b, c) ->
+      if not a or not b or not c
+        undefined
+      else
+        a + b / c
+
+    ## Bad
+
+    func = (a, b) ->
+      return a + b
+
+    func = (a, b) ->
+      if not a
+        return
+      a + b
+
+    func = (a, b, c) ->
+      if not a or not b or not c
+        return
+      a + b / c
+
+In fact, this is contrary to Felix's NodeJS style guide. We justify this
+approach by our intent to emphasize CoffeeScript's style of treating the last
+evaluated expression as return value. Another point to make is that the `if`
+blocks in CoffeeScript are much cleaner in general.
+
+This is Felix's example:
+
+    // Good
+
+    function isPercentage(val) {
+      if (val < 0) {
+        return false;
+      }
+
+      if (val > 100) {
+        return false;
+      }
+
+      return true;
+    }
+
+
+    // Bad
+
+    function isPercentage(val) {
+      if (val >= 0) {
+        if (val < 100) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    }
+
+In CoffeeScript:
+
+    ## Good
+
+    isPercentage = (val) ->
+      if val < 0
+        false
+      else if val > 100
+        false
+      else
+        true
+
+    ## Better (really?)
+
+    isPercentage = (val) ->
+      if val < 0
+        return false
+      if val > 100
+        return false
+      true
+
+    ## Bad
+
+    isPercentage = (v) ->
+      if v >= 0
+        if v < 100
+          true
+        else
+          false
+      else
+        false
+
+As usual, use your best judgement.
+
+The `return` statement is reserved and mandatory for function with no explicit
+return value.
+
+    foo = () ->
+      console.log 'bar'
+      return
+
+Using the explicit `return` statement with such functions guarantees that we
+won't accidentally end up with an unintended return value.
+
+## `if` and `switch`
+
+Always use the `if` statement on its own line.
+
+    ## Good
+
+    if a
+      return b
+    
+    ## Bad
+
+    return b if a
+
+Use the else clauses liberally whenever it doesn't create deeply nested
+branching.
+
+    ## Good
+
+    if a
+      return b
+    else
+      c
+
+    ## Bad
+
+    if a
+      return b
+    c
+
+Always use switch when testing multiple values of the same expression.
+
+    ## Good
+
+    switch foo
+      when 1
+        bar
+      when 2
+        baz
+      else
+        fam
+
+    ## Bad
+
+    if foo is 1
+      bar
+    else if foo is 2
+      baz
+    else
+      fam
+
+Assign complex conditions to variables.
+
+    ## Good
+
+    foo = a is 5 or b is 3 and c isnt 10
+    if foo
+      baz
+
+    ## Bad
+
+    if a is 14 or b is 3 and c isnt 10
+      baz
+
+## Functions
+
+Always use the parentheses.
+
+    ## Good
+
+    foo = () ->
+
+    ## Bad
+
+    foo = ->
+
+Very simple expressions should be on a single line.
+
+    foo = (a, b) -> a + b
+
+Complex function body should start on the next line indented by one level.
+
+    foo = (a, b) ->
+      a += 12
+      b -= 2
+      a / b + a * b
+
+When a function has many arguments that wrap into the next line, keep the first
+argument on the next line aligned with the bracket. The first line of the
+function body should start indented by one level from the 
+
+    ## Good
+
+    f = (arg1, arg2, arg3, arg4
+         arg5, arg6) ->
+      x = arg1 + arg2 / arg3
+      y = arg5 + arg6
+      x * y
+
+    ## Bad
+
+    f = (arg1, arg2, arg3, arg4,
+      arg5, arg6) ->
+      x = arg1 + arg2 / arg3
+      y = arg5 + arg6
+      x * y
+
+Always use parentheses for function calls.
+
+    ## Good
+
+    foo(bar)
+
+    ## Bad
+
+    foo bar
+
+When chaining function's return value, use the conventional syntax.
+
+    ## Good
+
+    foo(bar).baz()
+
+    ## Bad
+
+    (foo bar).baz()
+
+When arguments are many, list them one below the other. The last parenthesis
+should be at the same level as the function name or the beginning of the line.
+
+    ## Good
+
+    foo(
+      bar,
+      baz,
+      fam,
+      window.navigator.userAgent.match(/Foo/)[0]
+    )
+
+    a = foo(
+      bar,
+      baz,
+      fam
+      window.navigator.userAgent.match(/Foo/)[0]
+    )
+
+    ## Bad
+
+    foo(bar, baz, fam, 
+      window.location.hash.match(/Foo/)[0])
+
+    a = foo(
+      bar,
+      baz,
+      fam
+      window.navigator.userAgent.match(/Foo/)[0])
+
+When chaining multiple methods and wrapping lines, always leave the dot and the
+end of the line instead of the start of the next line. This gives us a clue
+that the next line is a continuation.
+
+    ## Good
+    
+    foo.
+      replace('a', 'b').
+      replace('c', 'd').
+      replace('e', 'f')
+
+    ## Bad
+
+    foo
+      .replace('a', 'b')
+      .replace('c', 'd')
+      .replace('e', 'f')
+
+
+## Immediately invoked function expressions
+
+Don't add whitespace after the initial parenthesis.
+
+    ## Good
+
+    (() ->
+      foo = 1
+    )()
+
+    ## Bad
+
+    (
+      () ->
+        foo = 1
+    )()
+
+Don't omit parentheses when passing arguments to the immediately invoked
+functions.
+
+    ## Good
+
+    ((root) ->
+      foo = root.foo
+    )(@)
+
+    ## Bad
+
+    ((root) ->
+      foo = root.foo
+    ) @
+
+## Objects
+
+Always use the braces around objects:
+
+    ## Good
+
+    foo = {a: 1, b: 2}
+
+    ## Bad
+
+    foo = a: 1, b: 2
+
+The reason no-brace object is bad is it tends to become very ambiguous:
+
+    ## Bad
+
+    foo(a: 2, c)  # Did we forget a value or it's another argument to foo?
+
+    ## Good
+
+    foo({a: 2}, c)  # Much better
+
+    ## Bad
+
+    foo =
+      a:      # What's this? Missing value?
+        b: 2,
+      c: 3,    # Error!
+        c: 4,
+
+    ## Good
+
+    foo = {
+      a: {b: 2},
+      c: 3,
+      d: 4,  # There, fixed it for ya!
+    }
+
+    ## Bad
+
+    foo(
+      a: 2,
+      b: 3,
+    , bar)  # Believe it or not, this is perfectly valid, but wrong
+
+    ## Good
+
+    foo({
+      a: 2,
+      b: 3,
+    }, bar)
+
+With that said, there are some situations where you can omit the braces. The
+only case when that is an improvement in readability is when assigning an
+object literal with a single level of keys:
+
+    ## Good
+
+    foo = {
+      a: 1,
+      b: 2,
+    }
+
+    ## Sometimes good (but try to avoid)
+
+    foo =
+      a: 1
+      b: 2
+
+For the last case, keep to minimum. Use it in places where it can be considered
+a DSL (e.g., in configuration modules).
+
+The keys in an object should be indented one level below the assignment:
+
+    foo = {
+      a: 1,
+      b: 2,
+      c: 3,
+    }
+
+If object has so many keys that they cannot fit on the same line, always list
+them one below the other:
+
+    ## Good
+
+    foo = {
+      a: 1,
+      b: 2,
+      c: 3,
+    }
+
+    ## Bad
+
+    foo = {a: 1, b: 2,
+           c: 3}
+
+## Arrays
+
+Rules for arrays are similar to those of the objects. Stick to the most
+conservative syntax possible.
+
+Always use brackets. They aren't optional anyway.
+
+    ## Good
+
+    foo = [
+      1,
+      2,
+      3,
+    ]
+
+    ## Broken
+
+    foo =
+      1
+      2  # WTF SyntaxError
+
+    foo = 1, 2, 3  # WTF foo is 1 not [1, 2, 3]
+
+Use CoffeeScript slices instead of `.slice()`.
+
+    ## Good
+
+    foo = [1, 2, 3,][0..1]
+
+    ## Not really wrong
+
+    foo = [1, 2, 3].slice(0, 1)
+
+## Destructuring assignment
+
+Prefer destructuring assignment over properties or slicing.
+
+    ## Good
+
+    {foo} = {foo: 1, bar: 2}
+    [bar, x, y] = [1, 2, 3]
+    {foo:baz} = someObj
+
+    ## Bad
+
+    foo = {foo: 1, bar: 2}.foo
+    bar = [1, 2, 3][0]
+    x = [1, 2, 3][1]
+    t = [1, 2, 3][2]
+    baz = someObj.foo
+
+This is especially useful with multiple assignment.
+
+## Boolean literals
+
+Always use `true` and `false`.
+
+    ## Good
+    
+    foo = true
+    bar = false
+
+    ## Bad
+    foo = on
+    bar = no
+
+## Conditional assignment
+
+Never use `or=`. It usually doesn't do what you mean. You usually want `?=`.
+
+    ## Good
+
+    func = ({a, b}) ->
+      a ?= 12
+      b ?= 4
+      a + b
+
+    func({a: 0, b: 5})  ## 5
+
+    ## Bad
+
+    func = ({a, b}) ->
+      a or= 12
+      b or= 4
+      a + b
+
+    func({a: 0, b: 5})  ## 17
+      
+The `or=` operator is a bit ambiguous so let's not use it. Instead, use a
+normal `if` block, or be more specific.
+
+    func = ({a, b}) ->
+
+      if a is 0
+        a = 12
+
+      if b is 0
+        b = 4
+
+      a + b
+
+## Testing for object properties
+
+Use `of` to test if an object has a property. Use `?` to test if the property's
+_value_ is defined and not null.
+
+    obj = {a: 1, b: 2, c: null}
+
+    if 'c' of obj
+      alert('foo')  ## This works
+
+    if obj.c?
+      alert('bar')  ## This won't fire
+
+Remember that `of` is not a replacement for `Object.hasOwnProperty`.
+
+    if Object.hasOwnProperty(obj, 'toString')
+      alert('foo')
+
+## Block strings and multi-line strings
+
+Don't use them. If you really want a long string that must wrap, simply use an
+array and join it, or use string concatenation (just like in JavaScript).
+
+    ## Good
+
+    s = [
+      'This is a very long string '
+      'that spans multiple lines.'
+    ].join('')
+
+    s = 'This is a very long string ' +
+      'that spans multiple lines.'
+
+    ## Bad
+
+    s = """
+        This is a very long string
+        that soans multiple lines.
+        """
+
+    s = "This is a very long string
+    that spans multiple lines."
+
+The reason you should avoid block strings is it faithfully retains all line
+breaks. The multi-line string is even worse as it doesn't understand
+indentation.
+
+CoffeeScript might not have usable multi-line strings yet, but at least it's as
+good as JavaScript.
+
+## Comments formatting
+
+Comments that represent inline documentation should be normal multi-line
+comments and not 
+
+Always include the module description at the top of the file. Use Markdown
+heading level 1 for the module's title. Always leave a blank comment line
+after the last line of the comment.
+
+    # # This is a module
+    # 
+    # This module does some pretty neat things that you will find useful
+    # because of this and that.
+    #
+
+When adding comments to relevant sections of the code as inline documentation,
+do so with normal multi-line comments rather than block comments. Always add
+comments _above_ the definition and use Markdown header formatting to add
+structure to your documentation.
+
+    # ## `foo(a, b)`
+    # 
+    # Returns the sum of `a` and `b`. `a` and `b` should be integers.
+    #
+    foo = (a, b) ->
+      a + b
+
+When a comment is not meant to be part of documentation, use double-pound.
+
+    ## TODO: Clean up this part
+    someCode
+
+
